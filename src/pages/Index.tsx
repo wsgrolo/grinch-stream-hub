@@ -280,11 +280,8 @@ const Index = () => {
         <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
             <p className="font-mono text-xs font-bold uppercase text-primary">all access points</p>
-            <h2 className="font-display text-4xl font-extrabold uppercase md:text-6xl">Follow the chaos</h2>
+            <h2 className="font-display text-4xl font-extrabold uppercase md:text-6xl">Follow the Grinch</h2>
           </div>
-          <p className="max-w-md text-muted-foreground">
-            Use these cards as the main link hub. Replace the placeholder URLs with Grinch&apos;s exact channels whenever you have them.
-          </p>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {links.map((link, index) => (
