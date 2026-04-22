@@ -1,16 +1,27 @@
+import { useState } from "react";
 import grinchHero from "@/assets/grinch-streamer-hero.jpg";
 import cam01Profile from "@/assets/cam-01-profile.png";
 import kickProfile from "@/assets/kick-profile.png";
 import youtubeTwitchProfile from "@/assets/youtube-twitch-profile.jpg";
 
+const DISCORD_INVITE = "https://discord.com/invite/zVJu4jtuYP";
+
 const links = [
   { label: "MannyTheGrinch", tag: "VOD vault", href: "https://www.youtube.com/@MannyTheGrinchLive", code: "YT", image: youtubeTwitchProfile, compactTitle: true },
   { label: "Kick", tag: "unfiltered live", href: "https://kick.com/grinch", code: "K", image: kickProfile },
   { label: "Twitch", tag: "main broadcast", href: "https://www.twitch.tv/grinch", code: "TV", image: youtubeTwitchProfile },
-  { label: "The Grinches", tag: "the lair", href: "https://discord.com/invite/zVJu4jtuYP", code: "DC", image: grinchHero },
+  { label: "The Grinches", tag: "the lair", href: DISCORD_INVITE, code: "DC", image: grinchHero },
 ];
 
 const Index = () => {
+  const [copiedDiscord, setCopiedDiscord] = useState(false);
+
+  const copyDiscordInvite = async () => {
+    await navigator.clipboard.writeText(DISCORD_INVITE);
+    setCopiedDiscord(true);
+    window.setTimeout(() => setCopiedDiscord(false), 1800);
+  };
+
   return (
     <main className="min-h-screen overflow-hidden bg-background text-foreground">
       <div className="pointer-events-none fixed inset-0 z-40 scanlines opacity-40" />
@@ -44,9 +55,12 @@ const Index = () => {
             <a href="https://www.twitch.tv/grinch" target="_blank" rel="noreferrer" className="group inline-flex min-h-12 items-center justify-center border-2 border-primary bg-primary px-6 font-mono text-sm font-bold uppercase text-primary-foreground transition-transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background">
               Watch live <span className="ml-3 transition-transform group-hover:translate-x-1">→</span>
             </a>
-            <a href="https://discord.com/invite/zVJu4jtuYP" target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center border-2 border-border bg-card px-6 font-mono text-sm font-bold uppercase text-card-foreground transition-colors hover:border-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background">
+            <a href={DISCORD_INVITE} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center border-2 border-border bg-card px-6 font-mono text-sm font-bold uppercase text-card-foreground transition-colors hover:border-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background">
               Join The Grinches
             </a>
+            <button type="button" onClick={copyDiscordInvite} className="inline-flex min-h-12 items-center justify-center border-2 border-secondary bg-secondary px-6 font-mono text-sm font-bold uppercase text-secondary-foreground transition-transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background">
+              {copiedDiscord ? "Copied" : "Copy Discord Invite"}
+            </button>
           </div>
         </div>
 
