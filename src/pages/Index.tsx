@@ -87,8 +87,6 @@ const extractVideoId = (value: string) => {
 const Index = () => {
   const [copiedDiscord, setCopiedDiscord] = useState(false);
   const [videoId, setVideoId] = useState(DEFAULT_VIDEO_ID);
-  const [videoStatus, setVideoStatus] = useState(`Now playing ID: ${DEFAULT_VIDEO_ID}`);
-  const [videoLoading, setVideoLoading] = useState(true);
   const videoFrameRef = useRef<HTMLIFrameElement | null>(null);
 
   const copyDiscordInvite = async () => {
@@ -98,8 +96,6 @@ const Index = () => {
   };
 
   useEffect(() => {
-    let isMounted = true;
-
     const hydratePageState = async () => {
       try {
         const response = await fetch(VIDEO_FUNCTION_PATH, {
@@ -107,32 +103,19 @@ const Index = () => {
           credentials: "include",
         });
 
-        if (!response.ok) {
-          setVideoStatus(`Now playing ID: ${DEFAULT_VIDEO_ID}`);
-          return;
-        }
+        if (!response.ok) return;
 
         const payload = (await response.json()) as { videoId?: string };
         const persistedVideoId = extractVideoId(payload.videoId ?? "");
-        if (!persistedVideoId) {
-          setVideoStatus(`Now playing ID: ${DEFAULT_VIDEO_ID}`);
-          return;
-        }
+        if (!persistedVideoId) return;
 
         setVideoId(persistedVideoId);
-        setVideoStatus(`Now playing ID: ${persistedVideoId}`);
       } catch {
-        setVideoStatus(`Now playing ID: ${DEFAULT_VIDEO_ID}`);
-      } finally {
-        if (isMounted) setVideoLoading(false);
+        return;
       }
     };
 
     void hydratePageState();
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
   const embedSrc = useMemo(
@@ -212,18 +195,6 @@ const Index = () => {
               </a>
             </div>
           </div>
-
-          <section className="w-full max-w-2xl space-y-2">
-            <p className="font-mono text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
-              Permanent background video
-            </p>
-            <p className="font-mono text-[11px] uppercase tracking-wide text-muted-foreground">
-              {videoLoading ? "Loading saved video..." : videoStatus}
-            </p>
-            <p className="font-mono text-[11px] uppercase tracking-wide text-muted-foreground">
-              Video selection is managed by the developer.
-            </p>
-          </section>
 
           <div className="hidden items-center gap-6 font-mono text-xs uppercase text-muted-foreground lg:flex">
             <a className="transition-colors hover:text-primary" href="#links">
