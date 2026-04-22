@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import grinchHero from "@/assets/grinch-streamer-hero.jpg";
 import cam01Profile from "@/assets/cam-01-profile.png";
 import kickProfile from "@/assets/kick-profile.png";
@@ -15,16 +15,36 @@ const links = [
     href: "https://www.youtube.com/@MannyTheGrinchLive",
     code: "YT",
     image: youtubeTwitchProfile,
+    accent: "0 100% 50%",
+    base: "0 0% 4%",
   },
-  { label: "Kick", tag: "unfiltered live", href: "https://kick.com/grinch", code: "K", image: kickProfile },
+  {
+    label: "Kick",
+    tag: "unfiltered live",
+    href: "https://kick.com/grinch",
+    code: "K",
+    image: kickProfile,
+    accent: "106 97% 50%",
+    base: "0 0% 4%",
+  },
   {
     label: "Twitch",
     tag: "main broadcast",
     href: "https://www.twitch.tv/grinch",
     code: "TV",
     image: youtubeTwitchProfile,
+    accent: "271 100% 64%",
+    base: "0 0% 4%",
   },
-  { label: "The Grinches", tag: "the lair", href: DISCORD_INVITE, code: "DC", image: grinchHero },
+  {
+    label: "The Grinches",
+    tag: "the lair",
+    href: DISCORD_INVITE,
+    code: "DC",
+    image: grinchHero,
+    accent: "235 86% 64%",
+    base: "0 0% 4%",
+  },
 ];
 
 const YOUTUBE_ID_PATTERN = /^[a-zA-Z0-9_-]{11}$/;
@@ -301,17 +321,23 @@ const Index = () => {
               href={link.href}
               target="_blank"
               rel="noreferrer"
-              className="group relative min-h-72 overflow-hidden border-2 border-border bg-card p-6 transition-all hover:-translate-y-2 hover:border-primary hover:shadow-signal focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              style={
+                {
+                  "--platform-accent": link.accent,
+                  "--platform-base": link.base,
+                } as CSSProperties
+              }
+              className="group relative min-h-72 overflow-hidden border-2 border-[hsl(var(--platform-accent)/0.5)] bg-[linear-gradient(155deg,hsl(var(--platform-base))_0%,hsl(var(--platform-base))_64%,hsl(var(--platform-accent)/0.18)_100%)] p-6 transition-all hover:-translate-y-2 hover:border-[hsl(var(--platform-accent))] hover:shadow-[0_0_34px_hsl(var(--platform-accent)/0.34)] focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
             >
               <div className="flex items-start justify-between gap-4">
                 <span className="font-mono text-xs uppercase text-muted-foreground">
                   00{index + 1} // {link.tag}
                 </span>
-                <span className="grid size-10 place-items-center border-2 border-primary bg-primary font-mono text-sm font-bold text-primary-foreground transition-transform group-hover:rotate-6 group-hover:scale-110">
+                <span className="grid size-10 place-items-center border-2 border-[hsl(var(--platform-accent))] bg-[hsl(var(--platform-accent))] font-mono text-sm font-bold text-black transition-transform group-hover:rotate-6 group-hover:scale-110">
                   {link.code}
                 </span>
               </div>
-              <div className="mx-auto mt-8 size-28 overflow-hidden rounded-full border-4 border-primary bg-muted shadow-signal transition-transform duration-300 group-hover:scale-105">
+              <div className="mx-auto mt-8 size-28 overflow-hidden rounded-full border-4 border-[hsl(var(--platform-accent))] bg-muted shadow-[0_0_24px_hsl(var(--platform-accent)/0.3)] transition-transform duration-300 group-hover:scale-105">
                 <img
                   src={link.image}
                   alt={`${link.label} profile picture for Grinch`}
@@ -324,13 +350,13 @@ const Index = () => {
               <div className="mt-8 flex items-end justify-between gap-4">
                 <div className="min-w-0">
                   <span
-                    className="block max-w-full truncate whitespace-nowrap font-display text-[clamp(1.1rem,2.2vw,1.45rem)] font-extrabold uppercase leading-[1] text-card-foreground transition-colors group-hover:text-primary"
+                    className="block max-w-full truncate whitespace-nowrap font-display text-[clamp(1.1rem,2.2vw,1.45rem)] font-extrabold uppercase leading-[1] text-card-foreground transition-colors group-hover:text-[hsl(var(--platform-accent))]"
                   >
                     {link.label}
                   </span>
                   <span className="mt-2 block font-mono text-xs uppercase text-muted-foreground">open channel</span>
                 </div>
-                <span className="font-mono text-2xl text-primary transition-transform group-hover:translate-x-1">→</span>
+                <span className="font-mono text-2xl text-[hsl(var(--platform-accent))] transition-transform group-hover:translate-x-1">→</span>
               </div>
             </a>
           ))}
