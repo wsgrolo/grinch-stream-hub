@@ -3,7 +3,7 @@ import kickProfile from "@/assets/kick-profile.png";
 import youtubeTwitchProfile from "@/assets/youtube-twitch-profile.jpg";
 
 const links = [
-  { label: "MannyTheGrinchLive", tag: "VOD vault", href: "https://www.youtube.com/@MannyTheGrinchLive", code: "YT", image: youtubeTwitchProfile },
+  { label: "MannyTheGrincher", tag: "VOD vault", href: "https://www.youtube.com/@MannyTheGrinchLive", code: "YT", image: youtubeTwitchProfile, compactTitle: true },
   { label: "Kick", tag: "unfiltered live", href: "https://kick.com/grinch", code: "K", image: kickProfile },
   { label: "Twitch", tag: "main broadcast", href: "https://www.twitch.tv/grinch", code: "TV", image: youtubeTwitchProfile },
   { label: "The Grinches", tag: "the lair", href: "https://discord.com/invite/zVJu4jtuYP", code: "DC", image: grinchHero },
@@ -90,7 +90,7 @@ const Index = () => {
               </div>
               <div className="mt-8 flex items-end justify-between gap-4">
                 <div>
-                  <span className="block font-display text-4xl font-extrabold uppercase text-card-foreground transition-colors group-hover:text-primary">{link.label}</span>
+                  <span className={`block font-display font-extrabold uppercase text-card-foreground transition-colors group-hover:text-primary ${link.compactTitle ? "text-2xl md:text-3xl" : "text-4xl"}`}>{link.label}</span>
                   <span className="mt-2 block font-mono text-xs uppercase text-muted-foreground">open channel</span>
                 </div>
                 <span className="font-mono text-2xl text-primary transition-transform group-hover:translate-x-1">→</span>
