@@ -3,6 +3,7 @@ import grinchHero from "@/assets/grinch-streamer-hero.jpg";
 import cam01Profile from "@/assets/cam-01-profile.png";
 import kickProfile from "@/assets/kick-profile.png";
 import youtubeTwitchProfile from "@/assets/youtube-twitch-profile.jpg";
+import discordProfile from "@/assets/discord-profile.png";
 
 const DISCORD_INVITE = "https://discord.com/invite/zVJu4jtuYP";
 const DEFAULT_VIDEO_ID = "jfKfPfyJRdk";
@@ -41,7 +42,7 @@ const links = [
     tag: "the lair",
     href: DISCORD_INVITE,
     code: "DC",
-    image: grinchHero,
+    image: discordProfile,
     accent: "235 86% 64%",
     base: "0 0% 4%",
   },
