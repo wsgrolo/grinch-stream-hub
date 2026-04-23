@@ -55,7 +55,7 @@ const Index = () => {
   const [audioVolume, setAudioVolume] = useState(40);
   const videoFrameRef = useRef<HTMLIFrameElement | null>(null);
   const activeVolumeRef = useRef(0);
-  const fadeIntervalRef = useRef<ReturnType<typeof window.setInterval> | null>(null);
+  const fadeIntervalRef = useRef<number | null>(null);
 
   const postVideoCommand = useCallback((func: string, args: unknown[] = []) => {
     const frameWindow = videoFrameRef.current?.contentWindow;
@@ -150,7 +150,8 @@ const Index = () => {
   const initializeBackgroundLoop = useCallback(() => {
     postVideoCommand("addEventListener", ["onStateChange"]);
     postVideoCommand(isAudioPlaying ? "playVideo" : "pauseVideo");
-    postVideoCommand("setVolume", [audioVolume]);
+    activeVolumeRef.current = isAudioPlaying ? audioVolume : 0;
+    postVideoCommand("setVolume", [activeVolumeRef.current]);
     postVideoCommand(isAudioPlaying && audioVolume > 0 ? "unMute" : "mute");
   }, [audioVolume, isAudioPlaying, postVideoCommand]);
 
