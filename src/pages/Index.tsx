@@ -6,8 +6,9 @@ import youtubeTwitchProfile from "@/assets/youtube-twitch-profile.jpg";
 import discordProfile from "@/assets/discord-profile.png";
 
 const DISCORD_INVITE = "https://discord.com/invite/zVJu4jtuYP";
-const DEFAULT_VIDEO_ID = "jfKfPfyJRdk";
-const VIDEO_FUNCTION_PATH = "/.netlify/functions/background-video";
+const DEFAULT_VIDEO_ID = "eSGT8vDqcP0";
+const AUDIO_FADE_STEP_MS = 80;
+const AUDIO_FADE_DURATION_MS = 900;
 
 const links = [
   {
@@ -48,48 +49,13 @@ const links = [
   },
 ];
 
-const YOUTUBE_ID_PATTERN = /^[a-zA-Z0-9_-]{11}$/;
-
-const extractVideoId = (value: string) => {
-  const trimmed = value.trim();
-  if (!trimmed) return null;
-  if (YOUTUBE_ID_PATTERN.test(trimmed)) return trimmed;
-
-  try {
-    const url = new URL(trimmed);
-
-    if (url.hostname === "youtu.be") {
-      const id = url.pathname.split("/").filter(Boolean)[0];
-      return id && YOUTUBE_ID_PATTERN.test(id) ? id : null;
-    }
-
-    if (url.hostname.includes("youtube.com")) {
-      const watchId = url.searchParams.get("v");
-      if (watchId && YOUTUBE_ID_PATTERN.test(watchId)) return watchId;
-
-      const pathParts = url.pathname.split("/").filter(Boolean);
-      const embedOrShortsId = pathParts[1];
-      if (
-        (pathParts[0] === "embed" || pathParts[0] === "shorts") &&
-        embedOrShortsId &&
-        YOUTUBE_ID_PATTERN.test(embedOrShortsId)
-      ) {
-        return embedOrShortsId;
-      }
-    }
-  } catch {
-    return null;
-  }
-
-  return null;
-};
-
 const Index = () => {
   const [copiedDiscord, setCopiedDiscord] = useState(false);
-  const [videoId, setVideoId] = useState(DEFAULT_VIDEO_ID);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [audioVolume, setAudioVolume] = useState(40);
   const videoFrameRef = useRef<HTMLIFrameElement | null>(null);
+  const activeVolumeRef = useRef(0);
+  const fadeIntervalRef = useRef<number | null>(null);
 
   const postVideoCommand = useCallback((func: string, args: unknown[] = []) => {
     const frameWindow = videoFrameRef.current?.contentWindow;
@@ -104,66 +70,88 @@ const Index = () => {
     window.setTimeout(() => setCopiedDiscord(false), 1800);
   };
 
+  const clearAudioFade = useCallback(() => {
+    if (!fadeIntervalRef.current) return;
+    window.clearInterval(fadeIntervalRef.current);
+    fadeIntervalRef.current = null;
+  }, []);
+
+  const fadeBackgroundVolume = useCallback(
+    (targetVolume: number, onComplete?: () => void) => {
+      clearAudioFade();
+      const startVolume = activeVolumeRef.current;
+      const steps = Math.max(1, Math.round(AUDIO_FADE_DURATION_MS / AUDIO_FADE_STEP_MS));
+      let currentStep = 0;
+
+      fadeIntervalRef.current = window.setInterval(() => {
+        currentStep += 1;
+        const progress = Math.min(currentStep / steps, 1);
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        const nextVolume = Math.round(startVolume + (targetVolume - startVolume) * easedProgress);
+
+        activeVolumeRef.current = nextVolume;
+        postVideoCommand("setVolume", [nextVolume]);
+
+        if (progress < 1) return;
+
+        clearAudioFade();
+        activeVolumeRef.current = targetVolume;
+        postVideoCommand("setVolume", [targetVolume]);
+        onComplete?.();
+      }, AUDIO_FADE_STEP_MS);
+    },
+    [clearAudioFade, postVideoCommand],
+  );
+
   const toggleBackgroundPlayback = () => {
     if (isAudioPlaying) {
-      postVideoCommand("pauseVideo");
       setIsAudioPlaying(false);
+      fadeBackgroundVolume(0, () => {
+        postVideoCommand("pauseVideo");
+        postVideoCommand("mute");
+      });
       return;
     }
 
+    clearAudioFade();
+    activeVolumeRef.current = 0;
     postVideoCommand("playVideo");
     postVideoCommand("unMute");
-    postVideoCommand("setVolume", [audioVolume]);
+    postVideoCommand("setVolume", [0]);
     setIsAudioPlaying(true);
+    fadeBackgroundVolume(audioVolume);
   };
 
   const updateBackgroundVolume = (value: string) => {
     const nextVolume = Number(value);
     setAudioVolume(nextVolume);
-    postVideoCommand("setVolume", [nextVolume]);
 
-    if (nextVolume > 0) {
+    if (isAudioPlaying && nextVolume > 0) {
+      clearAudioFade();
+      activeVolumeRef.current = nextVolume;
+      postVideoCommand("setVolume", [nextVolume]);
       postVideoCommand("unMute");
-    } else {
+    } else if (isAudioPlaying) {
+      clearAudioFade();
+      activeVolumeRef.current = 0;
+      postVideoCommand("setVolume", [0]);
       postVideoCommand("mute");
     }
   };
 
-  useEffect(() => {
-    const hydratePageState = async () => {
-      try {
-        const response = await fetch(VIDEO_FUNCTION_PATH, {
-          method: "GET",
-          credentials: "include",
-        });
-
-        if (!response.ok) return;
-
-        const payload = (await response.json()) as { videoId?: string };
-        const persistedVideoId = extractVideoId(payload.videoId ?? "");
-        if (!persistedVideoId) return;
-
-        setVideoId(persistedVideoId);
-      } catch {
-        return;
-      }
-    };
-
-    void hydratePageState();
-  }, []);
-
   const embedSrc = useMemo(
     () => {
       const origin = typeof window === "undefined" ? "" : window.location.origin;
-      return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&enablejsapi=1&origin=${encodeURIComponent(origin)}`;
+      return `https://www.youtube.com/embed/${DEFAULT_VIDEO_ID}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&enablejsapi=1&origin=${encodeURIComponent(origin)}`;
     },
-    [videoId],
+    [],
   );
 
   const initializeBackgroundLoop = useCallback(() => {
     postVideoCommand("addEventListener", ["onStateChange"]);
     postVideoCommand(isAudioPlaying ? "playVideo" : "pauseVideo");
-    postVideoCommand("setVolume", [audioVolume]);
+    activeVolumeRef.current = isAudioPlaying ? audioVolume : 0;
+    postVideoCommand("setVolume", [activeVolumeRef.current]);
     postVideoCommand(isAudioPlaying && audioVolume > 0 ? "unMute" : "mute");
   }, [audioVolume, isAudioPlaying, postVideoCommand]);
 
