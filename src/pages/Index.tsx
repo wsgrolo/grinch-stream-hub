@@ -6,8 +6,9 @@ import youtubeTwitchProfile from "@/assets/youtube-twitch-profile.jpg";
 import discordProfile from "@/assets/discord-profile.png";
 
 const DISCORD_INVITE = "https://discord.com/invite/zVJu4jtuYP";
-const DEFAULT_VIDEO_ID = "jfKfPfyJRdk";
-const VIDEO_FUNCTION_PATH = "/.netlify/functions/background-video";
+const DEFAULT_VIDEO_ID = "eSGT8vDqcP0";
+const AUDIO_FADE_STEP_MS = 80;
+const AUDIO_FADE_DURATION_MS = 900;
 
 const links = [
   {
@@ -48,48 +49,13 @@ const links = [
   },
 ];
 
-const YOUTUBE_ID_PATTERN = /^[a-zA-Z0-9_-]{11}$/;
-
-const extractVideoId = (value: string) => {
-  const trimmed = value.trim();
-  if (!trimmed) return null;
-  if (YOUTUBE_ID_PATTERN.test(trimmed)) return trimmed;
-
-  try {
-    const url = new URL(trimmed);
-
-    if (url.hostname === "youtu.be") {
-      const id = url.pathname.split("/").filter(Boolean)[0];
-      return id && YOUTUBE_ID_PATTERN.test(id) ? id : null;
-    }
-
-    if (url.hostname.includes("youtube.com")) {
-      const watchId = url.searchParams.get("v");
-      if (watchId && YOUTUBE_ID_PATTERN.test(watchId)) return watchId;
-
-      const pathParts = url.pathname.split("/").filter(Boolean);
-      const embedOrShortsId = pathParts[1];
-      if (
-        (pathParts[0] === "embed" || pathParts[0] === "shorts") &&
-        embedOrShortsId &&
-        YOUTUBE_ID_PATTERN.test(embedOrShortsId)
-      ) {
-        return embedOrShortsId;
-      }
-    }
-  } catch {
-    return null;
-  }
-
-  return null;
-};
-
 const Index = () => {
   const [copiedDiscord, setCopiedDiscord] = useState(false);
-  const [videoId, setVideoId] = useState(DEFAULT_VIDEO_ID);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [audioVolume, setAudioVolume] = useState(40);
   const videoFrameRef = useRef<HTMLIFrameElement | null>(null);
+  const activeVolumeRef = useRef(0);
+  const fadeIntervalRef = useRef<ReturnType<typeof window.setInterval> | null>(null);
 
   const postVideoCommand = useCallback((func: string, args: unknown[] = []) => {
     const frameWindow = videoFrameRef.current?.contentWindow;
