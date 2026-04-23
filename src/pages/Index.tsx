@@ -142,10 +142,16 @@ const Index = () => {
   const embedSrc = useMemo(
     () => {
       const origin = typeof window === "undefined" ? "" : window.location.origin;
-      return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&enablejsapi=1&origin=${encodeURIComponent(origin)}`;
+      return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&enablejsapi=1&origin=${encodeURIComponent(origin)}`;
     },
     [videoId],
   );
+
+  const initializeBackgroundLoop = useCallback(() => {
+    postVideoCommand("addEventListener", ["onStateChange"]);
+    postVideoCommand("playVideo");
+    postVideoCommand(isAudioMuted ? "mute" : "unMute");
+  }, [isAudioMuted, postVideoCommand]);
 
   useEffect(() => {
     const keepVideoLooping = (event: MessageEvent) => {
@@ -157,6 +163,7 @@ const Index = () => {
 
         postVideoCommand("seekTo", [0, true]);
         postVideoCommand("playVideo");
+        postVideoCommand(isAudioMuted ? "mute" : "unMute");
       } catch {
         return;
       }
@@ -164,15 +171,10 @@ const Index = () => {
 
     window.addEventListener("message", keepVideoLooping);
 
-    const subscribeToPlayerState = window.setTimeout(() => {
-      postVideoCommand("addEventListener", ["onStateChange"]);
-    }, 1000);
-
     return () => {
-      window.clearTimeout(subscribeToPlayerState);
       window.removeEventListener("message", keepVideoLooping);
     };
-  }, [postVideoCommand, videoId]);
+  }, [isAudioMuted, postVideoCommand]);
 
   return (
     <main className="min-h-screen overflow-hidden bg-background text-foreground">
@@ -182,6 +184,7 @@ const Index = () => {
           src={embedSrc}
           title="YouTube video background"
           className="youtube-bg-frame"
+          onLoad={initializeBackgroundLoop}
           allow="autoplay; encrypted-media; picture-in-picture"
           referrerPolicy="strict-origin-when-cross-origin"
         />
