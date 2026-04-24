@@ -413,6 +413,19 @@ const Index = () => {
                 </div>
                 <span className="font-mono text-2xl text-[hsl(var(--platform-accent))] transition-transform group-hover:translate-x-1">→</span>
               </div>
+              {link.subscribe && (
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    window.open(link.subscribe, "_blank", "noopener,noreferrer");
+                  }}
+                  className="relative z-10 mt-5 inline-flex w-full items-center justify-center border-2 border-[hsl(var(--platform-accent))] bg-[hsl(var(--platform-accent))] px-4 py-2 font-mono text-xs font-bold uppercase text-black transition-transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+                >
+                  Subscribe
+                </button>
+              )}
             </a>
           ))}
         </div>
