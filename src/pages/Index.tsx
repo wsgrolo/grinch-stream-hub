@@ -1,4 +1,5 @@
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Pause, Play } from "lucide-react";
 import grinchHero from "@/assets/grinch-streamer-hero.jpg";
 import cam01Profile from "@/assets/cam-01-profile.png";
 import kickProfile from "@/assets/kick-profile.png";
