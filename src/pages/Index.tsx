@@ -201,9 +201,9 @@ const Index = () => {
         if (payload.event !== "onStateChange" || payload.info !== 0) return;
 
         postVideoCommand("seekTo", [0, true]);
-        postVideoCommand(isAudioPlaying ? "playVideo" : "pauseVideo");
-        postVideoCommand("setVolume", [audioVolume]);
+        postVideoCommand("playVideo");
         postVideoCommand(isAudioPlaying && audioVolume > 0 ? "unMute" : "mute");
+        postVideoCommand("setVolume", [isAudioPlaying ? audioVolume : 0]);
       } catch {
         return;
       }
