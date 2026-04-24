@@ -297,9 +297,9 @@ const Index = () => {
           </div>
         </div>
 
-        <div className="relative animate-float motion-reduce:animate-none">
-          <div className="absolute -inset-2 bg-signal opacity-20 blur-2xl" />
-          <div className="relative overflow-hidden border-4 border-primary bg-card shadow-hard">
+        <div className="relative animate-float motion-reduce:animate-none [--cam-accent:106_97%_50%] [--cam-base:0_0%_4%]">
+          <div className="absolute -inset-2 bg-[linear-gradient(135deg,hsl(var(--cam-base))_0%,hsl(var(--cam-accent))_100%)] opacity-25 blur-2xl" />
+          <div className="relative overflow-hidden border-4 border-[hsl(var(--cam-accent))] bg-[hsl(var(--cam-base))] shadow-[0_0_40px_hsl(var(--cam-accent)/0.45)]">
             <img
               src={cam01Profile}
               alt="Grinch cam 01 profile portrait"
@@ -307,10 +307,10 @@ const Index = () => {
               height={896}
               className="aspect-[10/9] h-full w-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/10 to-transparent" />
-            <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between border border-primary/50 bg-background/80 px-4 py-3 font-mono text-xs uppercase backdrop-blur">
+            <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--cam-base))] via-[hsl(var(--cam-base)/0.1)] to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between border border-[hsl(var(--cam-accent)/0.6)] bg-[hsl(var(--cam-base)/0.85)] px-4 py-3 font-mono text-xs uppercase text-[hsl(var(--cam-accent))] backdrop-blur">
               <span>grinch</span>
-              <span className="text-primary">rec ●</span>
+              <span>rec ●</span>
             </div>
           </div>
         </div>
