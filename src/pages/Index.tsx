@@ -51,13 +51,42 @@ const links = [
   },
 ];
 
+const AUDIO_STATE_STORAGE_KEY = "grinch:audio-state";
+
+const readStoredAudioState = (): { isPlaying: boolean; volume: number } => {
+  if (typeof window === "undefined") return { isPlaying: true, volume: 40 };
+  try {
+    const raw = window.localStorage.getItem(AUDIO_STATE_STORAGE_KEY);
+    if (!raw) return { isPlaying: true, volume: 40 };
+    const parsed = JSON.parse(raw) as { isPlaying?: boolean; volume?: number };
+    const volume = typeof parsed.volume === "number" ? Math.min(100, Math.max(0, parsed.volume)) : 40;
+    const isPlaying = typeof parsed.isPlaying === "boolean" ? parsed.isPlaying : true;
+    return { isPlaying, volume };
+  } catch {
+    return { isPlaying: true, volume: 40 };
+  }
+};
+
 const Index = () => {
   const [copiedDiscord, setCopiedDiscord] = useState(false);
-  const [isAudioPlaying, setIsAudioPlaying] = useState(true);
-  const [audioVolume, setAudioVolume] = useState(40);
+  const initialAudioState = useMemo(readStoredAudioState, []);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(initialAudioState.isPlaying);
+  const [audioVolume, setAudioVolume] = useState(initialAudioState.volume);
   const videoFrameRef = useRef<HTMLIFrameElement | null>(null);
   const activeVolumeRef = useRef(0);
   const fadeIntervalRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(
+        AUDIO_STATE_STORAGE_KEY,
+        JSON.stringify({ isPlaying: isAudioPlaying, volume: audioVolume }),
+      );
+    } catch {
+      /* ignore quota errors */
+    }
+  }, [audioVolume, isAudioPlaying]);
 
   const postVideoCommand = useCallback((func: string, args: unknown[] = []) => {
     const frameWindow = videoFrameRef.current?.contentWindow;
@@ -109,7 +138,6 @@ const Index = () => {
     if (isAudioPlaying) {
       setIsAudioPlaying(false);
       fadeBackgroundVolume(0, () => {
-        postVideoCommand("pauseVideo");
         postVideoCommand("mute");
       });
       return;
@@ -173,9 +201,9 @@ const Index = () => {
         if (payload.event !== "onStateChange" || payload.info !== 0) return;
 
         postVideoCommand("seekTo", [0, true]);
-        postVideoCommand(isAudioPlaying ? "playVideo" : "pauseVideo");
-        postVideoCommand("setVolume", [audioVolume]);
+        postVideoCommand("playVideo");
         postVideoCommand(isAudioPlaying && audioVolume > 0 ? "unMute" : "mute");
+        postVideoCommand("setVolume", [isAudioPlaying ? audioVolume : 0]);
       } catch {
         return;
       }
