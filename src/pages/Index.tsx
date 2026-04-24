@@ -150,11 +150,18 @@ const Index = () => {
 
   const initializeBackgroundLoop = useCallback(() => {
     postVideoCommand("addEventListener", ["onStateChange"]);
-    postVideoCommand(isAudioPlaying ? "playVideo" : "pauseVideo");
-    activeVolumeRef.current = isAudioPlaying ? audioVolume : 0;
-    postVideoCommand("setVolume", [activeVolumeRef.current]);
-    postVideoCommand(isAudioPlaying && audioVolume > 0 ? "unMute" : "mute");
-  }, [audioVolume, isAudioPlaying, postVideoCommand]);
+    postVideoCommand("playVideo");
+    if (isAudioPlaying) {
+      activeVolumeRef.current = 0;
+      postVideoCommand("setVolume", [0]);
+      postVideoCommand("unMute");
+      fadeBackgroundVolume(audioVolume);
+    } else {
+      activeVolumeRef.current = 0;
+      postVideoCommand("setVolume", [0]);
+      postVideoCommand("mute");
+    }
+  }, [audioVolume, fadeBackgroundVolume, isAudioPlaying, postVideoCommand]);
 
   useEffect(() => {
     const keepVideoLooping = (event: MessageEvent) => {
