@@ -57,7 +57,7 @@ const links = [
     tag: "off-stream drops",
     href: "https://www.instagram.com/4kmanny/",
     code: "IG",
-    image: cam01Profile,
+    image: instagramProfile,
     accent: "330 100% 60%",
     base: "0 0% 4%",
   },
