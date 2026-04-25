@@ -5,6 +5,7 @@ import cam01Profile from "@/assets/cam-01-profile.png";
 import kickProfile from "@/assets/kick-profile.png";
 import youtubeTwitchProfile from "@/assets/youtube-twitch-profile.jpg";
 import discordProfile from "@/assets/discord-profile.png";
+import instagramProfile from "@/assets/instagram-profile.png";
 
 const DISCORD_INVITE = "https://discord.com/invite/zVJu4jtuYP";
 const BACKGROUND_VIDEO_URL = "https://www.youtube.com/watch?v=eSGT8vDqcP0";
