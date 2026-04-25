@@ -349,7 +349,7 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="relative z-10 overflow-hidden border-y border-border bg-card/60 py-6">
+      <section className="relative z-10 overflow-hidden border-y border-border bg-card/60 py-5 md:py-7">
         <div className="flex w-max animate-marquee-reverse whitespace-nowrap motion-reduce:animate-none">
           {Array.from({ length: 6 }).map((_, index) => (
             <p
@@ -362,14 +362,14 @@ const Index = () => {
         </div>
       </section>
 
-      <section id="links" className="relative z-10 mx-auto max-w-7xl px-5 py-16 md:px-8">
-        <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+      <section id="links" className="relative z-10 mx-auto max-w-7xl px-5 py-16 sm:px-6 md:px-10 md:py-20 lg:px-12 lg:py-24">
+        <div className="mb-10 flex flex-col justify-between gap-4 md:mb-14 md:flex-row md:items-end">
           <div>
             <p className="font-mono text-xs font-bold uppercase text-primary">all access points</p>
-            <h2 className="font-display text-4xl font-extrabold uppercase md:text-6xl">Follow the Grinch</h2>
+            <h2 className="mt-2 font-display text-4xl font-extrabold uppercase md:text-6xl">Follow the Grinch</h2>
           </div>
         </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-5 sm:grid-cols-2 md:gap-6 lg:grid-cols-4 lg:gap-7">
           {links.map((link, index) => (
             <a
               key={link.label}
