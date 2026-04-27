@@ -65,17 +65,16 @@ const links = [
 const AUDIO_STATE_STORAGE_KEY = "grinch:audio-state";
 
 const readStoredAudioState = (): { isPlaying: boolean; volume: number } => {
-  // Default muted-on-load so YouTube autoplay always succeeds; we unmute after first user gesture.
-  if (typeof window === "undefined") return { isPlaying: false, volume: 40 };
+  if (typeof window === "undefined") return { isPlaying: true, volume: 40 };
   try {
     const raw = window.localStorage.getItem(AUDIO_STATE_STORAGE_KEY);
-    if (!raw) return { isPlaying: false, volume: 40 };
+    if (!raw) return { isPlaying: true, volume: 40 };
     const parsed = JSON.parse(raw) as { isPlaying?: boolean; volume?: number };
     const volume = typeof parsed.volume === "number" ? Math.min(100, Math.max(0, parsed.volume)) : 40;
-    const isPlaying = typeof parsed.isPlaying === "boolean" ? parsed.isPlaying : false;
+    const isPlaying = typeof parsed.isPlaying === "boolean" ? parsed.isPlaying : true;
     return { isPlaying, volume };
   } catch {
-    return { isPlaying: false, volume: 40 };
+    return { isPlaying: true, volume: 40 };
   }
 };
 
@@ -301,7 +300,7 @@ const Index = () => {
 
       <section
         id="top"
-        className="relative z-10 mx-auto grid min-h-[86vh] max-w-7xl items-center gap-10 px-5 py-14 text-center sm:px-6 sm:py-16 md:grid-cols-[1.05fr_0.95fr] md:gap-14 md:px-10 md:py-20 md:text-left lg:gap-20 lg:px-12 lg:py-24"
+        className="relative z-10 mx-auto grid min-h-[86vh] max-w-7xl items-center gap-10 px-5 py-14 sm:px-6 sm:py-16 md:grid-cols-[1.05fr_0.95fr] md:gap-14 md:px-10 md:py-20 lg:gap-20 lg:px-12 lg:py-24"
       >
         <div className="space-y-8">
           <div className="space-y-5">
@@ -309,11 +308,11 @@ const Index = () => {
               Grinch
               <span className="block bg-signal bg-clip-text text-transparent">goes live</span>
             </h1>
-            <p className="mx-auto max-w-xl text-lg leading-8 text-muted-foreground md:mx-0 md:text-xl">
+            <p className="max-w-xl text-lg leading-8 text-muted-foreground md:text-xl">
               "If you ain't grinchin you ain't winning" - Manny
             </p>
           </div>
-          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:justify-center md:justify-start">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <a
               href="https://www.twitch.tv/grinch"
               target="_blank"
@@ -340,7 +339,7 @@ const Index = () => {
           </div>
         </div>
 
-        <div className="relative mx-auto w-full max-w-md animate-float motion-reduce:animate-none md:mx-0 md:max-w-none [--cam-accent:106_97%_50%] [--cam-base:0_0%_4%]">
+        <div className="relative animate-float motion-reduce:animate-none [--cam-accent:106_97%_50%] [--cam-base:0_0%_4%]">
           <div className="absolute -inset-2 bg-[linear-gradient(135deg,hsl(var(--cam-base))_0%,hsl(var(--cam-accent))_100%)] opacity-25 blur-2xl" />
           <div className="relative overflow-hidden border-4 border-[hsl(var(--cam-accent))] bg-[hsl(var(--cam-base))] shadow-[0_0_40px_hsl(var(--cam-accent)/0.45)]">
             <img
